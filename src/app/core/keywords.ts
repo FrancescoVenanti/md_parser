@@ -12,7 +12,6 @@ export enum Keywords {
   "u-list",
   "code",
   "horizontal-line",
-  "content",
 }
 
 //TODO FINISH
