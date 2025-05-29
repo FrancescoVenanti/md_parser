@@ -8,10 +8,10 @@ export enum Keywords {
   "paragraph",
   "bold",
   "italic",
-  "o-list",
-  "u-list",
+  "o_list",
+  "u_list",
   "code",
-  "horizontal-line",
+  "horizontal_line",
 }
 
 //TODO FINISH
