@@ -1,10 +1,12 @@
-import { Keywords } from "./keywords";
-
-type Tokentype = Keywords | string;
+// type Tokentype = Keywords | string;
 export class Token {
-  tokenType: Tokentype;
+  tokenType: TokenType;
+  position: [number, number];
+  value: string;
 
-  constructor(tokenType: Tokentype) {
+  constructor(position: [number, number], value: string, tokenType: TokenType) {
+    this.position = position;
+    this.value = value;
     this.tokenType = tokenType;
   }
 }
@@ -13,69 +15,111 @@ export class Tokenizer {
   constructor() {}
 
   tokenize(content: string): Token[] {
-    // let a: Keywords = Keywords.bold;
-    // let b: Token = new Token(Keywords.code, "aaaa");
-    // keyword.bold = "***"
     let tokenList: Token[] = [];
-    content.split(" ").map((c: string) => {
+    let row: number = 0;
+    let column: number = 0;
+
+    let token = "";
+    for (let i = 0; i <= content.length; i++) {
+      let c = content[i];
+      if (c == "\n") {
+        row++;
+        column = 0;
+      }
       console.log(c);
-      tokenList.push(new Token(this.getTokenType(c)));
-    });
+      let tokenType = this.getTokenType(c);
+      if (typeof tokenType == "string") {
+        token += c;
+      } else {
+        if (token != "") {
+          tokenList.push(
+            new Token(
+              [c == "\n" ? row - 1 : row, column - 1],
+              token,
+              TokenType.identifier
+            )
+          );
+          token = "";
+        }
+        tokenList.push(new Token([row, column], c, tokenType));
+      }
+      column++;
+    }
     return tokenList;
   }
 
-  getTokenType(value: string): Keywords | string {
-    let result: Keywords | string;
-    switch (value) {
-      case "#":
-        result = Keywords.header_1;
-        break;
-      case "##":
-        result = Keywords.header_2;
-        break;
-      case "###":
-        result = Keywords.header_3;
-        break;
-      case "####":
-        result = Keywords.header_4;
-        break;
-      case "#####":
-        result = Keywords.header_5;
-        break;
-      case "######":
-        result = Keywords.header_6;
-        break;
-      case "":
-        result = Keywords.paragraph;
-        break;
-      case "**":
-      case "__":
-        result = Keywords.bold;
-        break;
-      case "*":
-      case "_":
-        result = Keywords.italic;
-        break;
-      case "1.":
-        result = Keywords.o_list;
-        break;
-      case "-":
-      case "+":
-        result = Keywords.u_list;
-        break;
-      case "`":
-      case "```":
-        result = Keywords.code;
-        break;
-      case "---":
-      case "***":
-      case "___":
-        result = Keywords.horizontal_line;
-        break;
-      default:
-        result = value;
-        break;
+  getTokenType(value: string): TokenType | string {
+    const valueMap: Record<string, TokenType> = {
+      "#": TokenType.hashtag,
+      "*": TokenType.asterisk,
+      "\n": TokenType.br,
+      _: TokenType.underscore,
+      "`": TokenType.backtick,
+      "~": TokenType.tilde,
+      "-": TokenType.dash,
+      "+": TokenType.plus,
+      "=": TokenType.equals,
+      "[": TokenType.leftBracket,
+      "]": TokenType.rightBracket,
+      "(": TokenType.leftParen,
+      ")": TokenType.rightParen,
+      "{": TokenType.leftBrace,
+      "}": TokenType.rightBrace,
+      "<": TokenType.leftAngle,
+      ">": TokenType.rightAngle,
+      "|": TokenType.pipe,
+      "!": TokenType.exclamation,
+      ":": TokenType.colon,
+      ";": TokenType.semicolon,
+      ",": TokenType.comma,
+      ".": TokenType.dot,
+      "?": TokenType.question,
+      "/": TokenType.slash,
+      "\\": TokenType.backslash,
+      '"': TokenType.doubleQuote,
+      "'": TokenType.singleQuote,
+      " ": TokenType.space,
+      "\t": TokenType.tab,
+      "\r": TokenType.cr,
+    };
+    if (value in valueMap) {
+      return valueMap[value];
     }
-    return result;
+    return value;
   }
+}
+
+enum TokenType {
+  asterisk,
+  hashtag,
+  identifier,
+  br,
+  underscore,
+  backtick,
+  tilde,
+  dash,
+  plus,
+  equals,
+  leftBracket,
+  rightBracket,
+  leftParen,
+  rightParen,
+  leftBrace,
+  rightBrace,
+  leftAngle,
+  rightAngle,
+  pipe,
+  exclamation,
+  colon,
+  semicolon,
+  comma,
+  dot,
+  question,
+  slash,
+  backslash,
+  doubleQuote,
+  singleQuote,
+  space,
+  tab,
+  cr,
 }
