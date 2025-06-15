@@ -26,7 +26,6 @@ export class Tokenizer {
         row++;
         column = 0;
       }
-      console.log(c);
       let tokenType = this.getTokenType(c);
       if (typeof tokenType == "string") {
         token += c;
@@ -89,7 +88,7 @@ export class Tokenizer {
   }
 }
 
-enum TokenType {
+export enum TokenType {
   asterisk,
   hashtag,
   identifier,
